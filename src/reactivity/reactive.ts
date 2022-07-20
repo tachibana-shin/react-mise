@@ -1,4 +1,4 @@
-import { def, isObject, toRawType } from "@vue/shared"
+import { def, isObject, toRawType } from "./shared"
 
 import {
   mutableHandlers,
@@ -19,7 +19,7 @@ export const enum ReactiveFlags {
   IS_REACTIVE = "__v_isReactive",
   IS_READONLY = "__v_isReadonly",
   IS_SHALLOW = "__v_isShallow",
-  RAW = "__v_raw",
+  RAW = "__v_raw"
 }
 
 export interface Target {
@@ -38,7 +38,7 @@ export const shallowReadonlyMap = new WeakMap<Target, any>()
 const enum TargetType {
   INVALID = 0,
   COMMON = 1,
-  COLLECTION = 2,
+  COLLECTION = 2
 }
 
 function targetTypeMap(rawType: string) {
@@ -63,7 +63,7 @@ function getTargetType(value: Target) {
 }
 
 // only unwrap nested ref
-export type UnwrapNestedRefs<T> = T extends Ref ? T : UnwrapRefSimple<T>;
+export type UnwrapNestedRefs<T> = T extends Ref ? T : UnwrapRefSimple<T>
 
 /**
  * Creates a reactive copy of the original object.
@@ -87,11 +87,10 @@ export type UnwrapNestedRefs<T> = T extends Ref ? T : UnwrapRefSimple<T>;
  * count.value // -> 1
  * ```
  */
-export function reactive<T extends object>(target: T): UnwrapNestedRefs<T>;
+export function reactive<T extends object>(target: T): UnwrapNestedRefs<T>
 export function reactive(target: object) {
   // if trying to observe a readonly proxy, return the readonly version.
-  if (isReadonly(target))
-    return target
+  if (isReadonly(target)) return target
 
   return createReactiveObject(
     target,
@@ -104,7 +103,7 @@ export function reactive(target: object) {
 
 export declare const ShallowReactiveMarker: unique symbol
 
-export type ShallowReactive<T> = T & { [ShallowReactiveMarker]?: true };
+export type ShallowReactive<T> = T & { [ShallowReactiveMarker]?: true }
 
 /**
  * Return a shallowly-reactive copy of the original object, where only the root
@@ -123,8 +122,8 @@ export function shallowReactive<T extends object>(
   )
 }
 
-type Primitive = string | number | boolean | bigint | symbol | undefined | null;
-type Builtin = Primitive | Function | Date | Error | RegExp;
+type Primitive = string | number | boolean | bigint | symbol | undefined | null
+type Builtin = Primitive | Function | Date | Error | RegExp
 export type DeepReadonly<T> = T extends Builtin
   ? T
   : T extends Map<infer K, infer V>
@@ -145,7 +144,7 @@ export type DeepReadonly<T> = T extends Builtin
   ? Readonly<Ref<DeepReadonly<U>>>
   : T extends {}
   ? { readonly [K in keyof T]: DeepReadonly<T[K]> }
-  : Readonly<T>;
+  : Readonly<T>
 
 /**
  * Creates a readonly copy of the original object. Note the returned copy is not
@@ -186,8 +185,7 @@ function createReactiveObject(
   collectionHandlers: ProxyHandler<any>,
   proxyMap: WeakMap<Target, any>
 ) {
-  if (!isObject(target))
-    return target
+  if (!isObject(target)) return target
 
   // target is already a Proxy, return it.
   // exception: calling readonly() on a reactive object
@@ -199,13 +197,11 @@ function createReactiveObject(
 
   // target already has corresponding Proxy
   const existingProxy = proxyMap.get(target)
-  if (existingProxy)
-    return existingProxy
+  if (existingProxy) return existingProxy
 
   // only specific value types can be observed.
   const targetType = getTargetType(target)
-  if (targetType === TargetType.INVALID)
-    return target
+  if (targetType === TargetType.INVALID) return target
 
   const proxy = new Proxy(
     target,
@@ -216,8 +212,7 @@ function createReactiveObject(
 }
 
 export function isReactive(value: unknown): boolean {
-  if (isReadonly(value))
-    return isReactive((value as Target)[ReactiveFlags.RAW])
+  if (isReadonly(value)) return isReactive((value as Target)[ReactiveFlags.RAW])
 
   return !!(value && (value as Target)[ReactiveFlags.IS_REACTIVE])
 }
@@ -247,7 +242,7 @@ export function markRaw<T extends object>(
 }
 
 export const toReactive = <T extends unknown>(value: T): T =>
-  isObject(value) ? reactive(value) : value
+  (isObject(value) ? reactive(value) : value) as T
 
 export const toReadonly = <T extends unknown>(value: T): T =>
   isObject(value) ? readonly(value as Record<any, any>) : value

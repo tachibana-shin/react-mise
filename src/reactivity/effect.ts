@@ -1,4 +1,4 @@
-import { extend, isArray, isIntegerKey, isMap } from "@vue/shared"
+import { extend, isArray, isIntegerKey, isMap } from "./shared"
 
 import type { ComputedRefImpl } from "./computed"
 import type { Dep } from "./dep"

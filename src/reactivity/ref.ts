@@ -1,5 +1,5 @@
-import type { IfAny } from "@vue/shared"
-import { hasChanged, isArray } from "@vue/shared"
+import type { IfAny } from "./shared"
+import { hasChanged, isArray } from "./shared"
 
 import type { CollectionTypes } from "./collectionHandlers"
 import type { Dep } from "./dep"

@@ -1,4 +1,4 @@
-import { isFunction, NOOP } from "@vue/shared"
+import { isFunction, NOOP } from "./shared"
 
 import type { Dep } from "./dep"
 import { ReactiveEffect } from "./effect"

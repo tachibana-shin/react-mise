@@ -1,4 +1,4 @@
-import { isFunction, isPromise } from "@vue/shared"
+import { isFunction, isPromise } from "./shared"
 
 export function callWithErrorHandling(
   fn: Function,

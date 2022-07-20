@@ -7,7 +7,7 @@ import {
   isObject,
   isSymbol,
   makeMap
-} from "@vue/shared"
+} from "./shared"
 
 import {
   ITERATE_KEY,

@@ -1,10 +1,9 @@
-import { hasChanged, isArray, isFunction, isObject, NOOP } from "@vue/shared"
+import { hasChanged, isArray, isFunction, isObject, NOOP } from "./shared"
 
 import type { ComputedRef } from "./computed"
 import type { EffectScheduler } from "./effect"
 import {
-  ReactiveEffect,
-  ReactiveEffectOptions
+  ReactiveEffect
 } from "./effect"
 import {
   callWithAsyncErrorHandling,
