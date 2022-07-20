@@ -1,6 +1,6 @@
 {
   "name": "react-mise",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Intuitive, type safe and flexible Store for React",
   "scripts": {
     "format": "prettier -w src",
