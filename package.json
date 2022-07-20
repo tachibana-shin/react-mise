@@ -1,7 +1,7 @@
 {
-  "name": "react-store",
+  "name": "react-mise",
   "version": "0.0.1",
-  "description": "a repository npm package",
+  "description": "Intuitive, type safe and flexible Store for React",
   "scripts": {
     "format": "prettier -w src",
     "build": "tsup && tsc",
@@ -47,11 +47,11 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git://github.com/Tachibana-Shin/react-store.git"
+    "url": "git://github.com/Tachibana-Shin/react-mise.git"
   },
-  "homepage": "https://Tachibana-Shin.github.io/react-store",
+  "homepage": "https://Tachibana-Shin.github.io/react-mise",
   "keywords": [
-    "react-store",
+    "react-mise",
     "Tachibana Shin",
     "Tachibana-Shin"
   ],
