@@ -1,111 +1,112 @@
-import { describe, it, expect, vi } from "vitest";
-import { effect } from "../../effect";
-import { reactive, isReactive, toRaw } from "../../reactive";
+import { describe, expect, it, vi } from "vitest"
+
+import { effect } from "../../effect"
+import { isReactive, reactive, toRaw } from "../../reactive"
 
 describe("reactivity/collections", () => {
   describe("WeakSet", () => {
     it("instanceof", () => {
-      const original = new WeakSet();
-      const observed = reactive(original);
-      expect(isReactive(observed)).toBe(true);
-      expect(original instanceof WeakSet).toBe(true);
-      expect(observed instanceof WeakSet).toBe(true);
-    });
+      const original = new WeakSet()
+      const observed = reactive(original)
+      expect(isReactive(observed)).toBe(true)
+      expect(original instanceof WeakSet).toBe(true)
+      expect(observed instanceof WeakSet).toBe(true)
+    })
 
     it("should observe mutations", () => {
-      let dummy;
-      const value = {};
-      const set = reactive(new WeakSet());
-      effect(() => (dummy = set.has(value)));
+      let dummy
+      const value = {}
+      const set = reactive(new WeakSet())
+      effect(() => (dummy = set.has(value)))
 
-      expect(dummy).toBe(false);
-      set.add(value);
-      expect(dummy).toBe(true);
-      set.delete(value);
-      expect(dummy).toBe(false);
-    });
+      expect(dummy).toBe(false)
+      set.add(value)
+      expect(dummy).toBe(true)
+      set.delete(value)
+      expect(dummy).toBe(false)
+    })
 
     it("should observe mutations with observed value", () => {
-      let dummy;
-      const value = reactive({});
-      const set = reactive(new WeakSet());
-      effect(() => (dummy = set.has(value)));
+      let dummy
+      const value = reactive({})
+      const set = reactive(new WeakSet())
+      effect(() => (dummy = set.has(value)))
 
-      expect(dummy).toBe(false);
-      set.add(value);
-      expect(dummy).toBe(true);
-      set.delete(value);
-      expect(dummy).toBe(false);
-    });
+      expect(dummy).toBe(false)
+      set.add(value)
+      expect(dummy).toBe(true)
+      set.delete(value)
+      expect(dummy).toBe(false)
+    })
 
     it("should not observe custom property mutations", () => {
-      let dummy;
-      const set: any = reactive(new WeakSet());
-      effect(() => (dummy = set.customProp));
+      let dummy
+      const set: any = reactive(new WeakSet())
+      effect(() => (dummy = set.customProp))
 
-      expect(dummy).toBe(undefined);
-      set.customProp = "Hello World";
-      expect(dummy).toBe(undefined);
-    });
+      expect(dummy).toBe(undefined)
+      set.customProp = "Hello World"
+      expect(dummy).toBe(undefined)
+    })
 
     it("should not observe non value changing mutations", () => {
-      let dummy;
-      const value = {};
-      const set = reactive(new WeakSet());
-      const setSpy = vi.fn(() => (dummy = set.has(value)));
-      effect(setSpy);
+      let dummy
+      const value = {}
+      const set = reactive(new WeakSet())
+      const setSpy = vi.fn(() => (dummy = set.has(value)))
+      effect(setSpy)
 
-      expect(dummy).toBe(false);
-      expect(setSpy).toHaveBeenCalledTimes(1);
-      set.add(value);
-      expect(dummy).toBe(true);
-      expect(setSpy).toHaveBeenCalledTimes(2);
-      set.add(value);
-      expect(dummy).toBe(true);
-      expect(setSpy).toHaveBeenCalledTimes(2);
-      set.delete(value);
-      expect(dummy).toBe(false);
-      expect(setSpy).toHaveBeenCalledTimes(3);
-      set.delete(value);
-      expect(dummy).toBe(false);
-      expect(setSpy).toHaveBeenCalledTimes(3);
-    });
+      expect(dummy).toBe(false)
+      expect(setSpy).toHaveBeenCalledTimes(1)
+      set.add(value)
+      expect(dummy).toBe(true)
+      expect(setSpy).toHaveBeenCalledTimes(2)
+      set.add(value)
+      expect(dummy).toBe(true)
+      expect(setSpy).toHaveBeenCalledTimes(2)
+      set.delete(value)
+      expect(dummy).toBe(false)
+      expect(setSpy).toHaveBeenCalledTimes(3)
+      set.delete(value)
+      expect(dummy).toBe(false)
+      expect(setSpy).toHaveBeenCalledTimes(3)
+    })
 
     it("should not observe raw data", () => {
-      const value = {};
-      let dummy;
-      const set = reactive(new WeakSet());
-      effect(() => (dummy = toRaw(set).has(value)));
+      const value = {}
+      let dummy
+      const set = reactive(new WeakSet())
+      effect(() => (dummy = toRaw(set).has(value)))
 
-      expect(dummy).toBe(false);
-      set.add(value);
-      expect(dummy).toBe(false);
-    });
+      expect(dummy).toBe(false)
+      set.add(value)
+      expect(dummy).toBe(false)
+    })
 
     it("should not be triggered by raw mutations", () => {
-      const value = {};
-      let dummy;
-      const set = reactive(new WeakSet());
-      effect(() => (dummy = set.has(value)));
+      const value = {}
+      let dummy
+      const set = reactive(new WeakSet())
+      effect(() => (dummy = set.has(value)))
 
-      expect(dummy).toBe(false);
-      toRaw(set).add(value);
-      expect(dummy).toBe(false);
-    });
+      expect(dummy).toBe(false)
+      toRaw(set).add(value)
+      expect(dummy).toBe(false)
+    })
 
     it("should not pollute original Set with Proxies", () => {
-      const set = new WeakSet();
-      const observed = reactive(set);
-      const value = reactive({});
-      observed.add(value);
-      expect(observed.has(value)).toBe(true);
-      expect(set.has(value)).toBe(false);
-    });
+      const set = new WeakSet()
+      const observed = reactive(set)
+      const value = reactive({})
+      observed.add(value)
+      expect(observed.has(value)).toBe(true)
+      expect(set.has(value)).toBe(false)
+    })
 
     it("should return proxy from WeakSet.add call", () => {
-      const set = reactive(new WeakSet());
-      const result = set.add({});
-      expect(result).toBe(set);
-    });
-  });
-});
+      const set = reactive(new WeakSet())
+      const result = set.add({})
+      expect(result).toBe(set)
+    })
+  })
+})

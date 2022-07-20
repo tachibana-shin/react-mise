@@ -1,4 +1,5 @@
-import { ReactiveEffect, trackOpBit } from './effect'
+import type { ReactiveEffect } from "./effect"
+import { trackOpBit } from "./effect"
 
 export type Dep = Set<ReactiveEffect> & TrackedMarkers
 
@@ -7,7 +8,7 @@ export type Dep = Set<ReactiveEffect> & TrackedMarkers
  * tracking recursion. One bit per level is used to define whether the dependency
  * was/is tracked.
  */
-type TrackedMarkers = {
+interface TrackedMarkers {
   /**
    * wasTracked
    */
@@ -31,9 +32,8 @@ export const newTracked = (dep: Dep): boolean => (dep.n & trackOpBit) > 0
 
 export const initDepMarkers = ({ deps }: ReactiveEffect) => {
   if (deps.length) {
-    for (let i = 0; i < deps.length; i++) {
+    for (let i = 0; i < deps.length; i++)
       deps[i].w |= trackOpBit // set was tracked
-    }
   }
 }
 
@@ -43,11 +43,11 @@ export const finalizeDepMarkers = (effect: ReactiveEffect) => {
     let ptr = 0
     for (let i = 0; i < deps.length; i++) {
       const dep = deps[i]
-      if (wasTracked(dep) && !newTracked(dep)) {
+      if (wasTracked(dep) && !newTracked(dep))
         dep.delete(effect)
-      } else {
+      else
         deps[ptr++] = dep
-      }
+
       // clear bits
       dep.w &= ~trackOpBit
       dep.n &= ~trackOpBit

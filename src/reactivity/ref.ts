@@ -1,51 +1,53 @@
+import type { IfAny } from "@vue/shared"
+import { hasChanged, isArray } from "@vue/shared"
+
+import type { CollectionTypes } from "./collectionHandlers"
+import type { Dep } from "./dep"
+import { createDep } from "./dep"
 import {
   activeEffect,
   shouldTrack,
   trackEffects,
-  triggerEffects,
-} from './effect';
-import { TrackOpTypes, TriggerOpTypes } from './operations';
-import { isArray, hasChanged, IfAny } from '@vue/shared';
-import { isProxy, toRaw, isReactive, toReactive } from './reactive';
-import type { ShallowReactiveMarker } from './reactive';
-import { CollectionTypes } from './collectionHandlers';
-import { createDep, Dep } from './dep';
+  triggerEffects
+} from "./effect"
+import { TrackOpTypes, TriggerOpTypes } from "./operations"
+import { isProxy, isReactive, toRaw, toReactive } from "./reactive"
+import type { ShallowReactiveMarker } from "./reactive"
 
-declare const RefSymbol: unique symbol;
-export declare const RawSymbol: unique symbol;
+declare const RefSymbol: unique symbol
+export declare const RawSymbol: unique symbol
 
 export interface Ref<T = any> {
-  value: T;
+  value: T
   /**
    * Type differentiator only.
    * We need this to be in public d.ts but don't want it to show up in IDE
    * autocomplete, so we use a private Symbol instead.
    */
-  [RefSymbol]: true;
+  [RefSymbol]: true
 }
 
-type RefBase<T> = {
-  dep?: Dep;
-  value: T;
-};
+interface RefBase<T> {
+  dep?: Dep
+  value: T
+}
 
 export function trackRefValue(ref: RefBase<any>) {
   if (shouldTrack && activeEffect) {
-    ref = toRaw(ref);
-    trackEffects(ref.dep || (ref.dep = createDep()));
+    ref = toRaw(ref)
+    trackEffects(ref.dep || (ref.dep = createDep()))
   }
 }
 
 export function triggerRefValue(ref: RefBase<any>, newVal?: any) {
-  ref = toRaw(ref);
-  if (ref.dep) {
-    triggerEffects(ref.dep);
-  }
+  ref = toRaw(ref)
+  if (ref.dep)
+    triggerEffects(ref.dep)
 }
 
 export function isRef<T>(r: Ref<T> | unknown): r is Ref<T>;
 export function isRef(r: any): r is Ref {
-  return !!(r && r.__v_isRef === true);
+  return !!(r && r.__v_isRef === true)
 }
 
 export function ref<T extends object>(
@@ -54,10 +56,10 @@ export function ref<T extends object>(
 export function ref<T>(value: T): Ref<UnwrapRef<T>>;
 export function ref<T = any>(): Ref<T | undefined>;
 export function ref(value?: unknown) {
-  return createRef(value, false);
+  return createRef(value, false)
 }
 
-declare const ShallowRefMarker: unique symbol;
+declare const ShallowRefMarker: unique symbol
 
 export type ShallowRef<T = any> = Ref<T> & { [ShallowRefMarker]?: true };
 
@@ -67,123 +69,123 @@ export function shallowRef<T extends object>(
 export function shallowRef<T>(value: T): ShallowRef<T>;
 export function shallowRef<T = any>(): ShallowRef<T | undefined>;
 export function shallowRef(value?: unknown) {
-  return createRef(value, true);
+  return createRef(value, true)
 }
 
 function createRef(rawValue: unknown, shallow: boolean) {
-  if (isRef(rawValue)) {
-    return rawValue;
-  }
-  return new RefImpl(rawValue, shallow);
+  if (isRef(rawValue))
+    return rawValue
+
+  return new RefImpl(rawValue, shallow)
 }
 
 class RefImpl<T> {
-  private _value: T;
-  private _rawValue: T;
+  private _value: T
+  private _rawValue: T
 
-  public dep?: Dep = undefined;
-  public readonly __v_isRef = true;
+  public dep?: Dep = undefined
+  public readonly __v_isRef = true
 
   constructor(value: T, public readonly __v_isShallow: boolean) {
-    this._rawValue = __v_isShallow ? value : toRaw(value);
-    this._value = __v_isShallow ? value : toReactive(value);
+    this._rawValue = __v_isShallow ? value : toRaw(value)
+    this._value = __v_isShallow ? value : toReactive(value)
   }
 
   get value() {
-    trackRefValue(this);
-    return this._value;
+    trackRefValue(this)
+    return this._value
   }
 
   set value(newVal) {
-    newVal = this.__v_isShallow ? newVal : toRaw(newVal);
+    newVal = this.__v_isShallow ? newVal : toRaw(newVal)
     if (hasChanged(newVal, this._rawValue)) {
-      this._rawValue = newVal;
-      this._value = this.__v_isShallow ? newVal : toReactive(newVal);
-      triggerRefValue(this, newVal);
+      this._rawValue = newVal
+      this._value = this.__v_isShallow ? newVal : toReactive(newVal)
+      triggerRefValue(this, newVal)
     }
   }
 }
 
 export function triggerRef(ref: Ref) {
-  triggerRefValue(ref);
+  triggerRefValue(ref)
 }
 
 export function unref<T>(ref: T | Ref<T>): T {
-  return isRef(ref) ? (ref.value as any) : ref;
+  return isRef(ref) ? (ref.value as any) : ref
 }
 
 const shallowUnwrapHandlers: ProxyHandler<any> = {
   get: (target, key, receiver) => unref(Reflect.get(target, key, receiver)),
   set: (target, key, value, receiver) => {
-    const oldValue = target[key];
+    const oldValue = target[key]
     if (isRef(oldValue) && !isRef(value)) {
-      oldValue.value = value;
-      return true;
+      oldValue.value = value
+      return true
     } else {
-      return Reflect.set(target, key, value, receiver);
+      return Reflect.set(target, key, value, receiver)
     }
-  },
-};
+  }
+}
 
 export function proxyRefs<T extends object>(
   objectWithRefs: T
 ): ShallowUnwrapRef<T> {
   return isReactive(objectWithRefs)
     ? objectWithRefs
-    : new Proxy(objectWithRefs, shallowUnwrapHandlers);
+    : new Proxy(objectWithRefs, shallowUnwrapHandlers)
 }
 
 export type CustomRefFactory<T> = (
   track: () => void,
   trigger: () => void
 ) => {
-  get: () => T;
-  set: (value: T) => void;
+  get: () => T
+  set: (value: T) => void
 };
 
 class CustomRefImpl<T> {
-  public dep?: Dep = undefined;
+  public dep?: Dep = undefined
 
-  private readonly _get: ReturnType<CustomRefFactory<T>>['get'];
-  private readonly _set: ReturnType<CustomRefFactory<T>>['set'];
+  private readonly _get: ReturnType<CustomRefFactory<T>>["get"]
+  private readonly _set: ReturnType<CustomRefFactory<T>>["set"]
 
-  public readonly __v_isRef = true;
+  public readonly __v_isRef = true
 
   constructor(factory: CustomRefFactory<T>) {
     const { get, set } = factory(
       () => trackRefValue(this),
       () => triggerRefValue(this)
-    );
-    this._get = get;
-    this._set = set;
+    )
+    this._get = get
+    this._set = set
   }
 
   get value() {
-    return this._get();
+    return this._get()
   }
 
   set value(newVal) {
-    this._set(newVal);
+    this._set(newVal)
   }
 }
 
 export function customRef<T>(factory: CustomRefFactory<T>): Ref<T> {
-  return new CustomRefImpl(factory) as any;
+  return new CustomRefImpl(factory) as any
 }
 
 export type ToRefs<T = any> = {
   [K in keyof T]: ToRef<T[K]>;
 };
 export function toRefs<T extends object>(object: T): ToRefs<T> {
-  const ret: any = isArray(object) ? new Array(object.length) : {};
-  for (const key in object) {
-    ret[key] = toRef(object, key);
-  }
-  return ret;
+  const ret: any = isArray(object) ? new Array(object.length) : {}
+  for (const key in object)
+    ret[key] = toRef(object, key)
+
+  return ret
 }
 
 class ObjectRefImpl<T extends object, K extends keyof T> {
-  public readonly __v_isRef = true;
+  public readonly __v_isRef = true
 
   constructor(
     private readonly _object: T,
@@ -192,12 +194,12 @@ class ObjectRefImpl<T extends object, K extends keyof T> {
   ) {}
 
   get value() {
-    const val = this._object[this._key];
-    return val === undefined ? (this._defaultValue as T[K]) : val;
+    const val = this._object[this._key]
+    return val === undefined ? (this._defaultValue as T[K]) : val
   }
 
   set value(newVal) {
-    this._object[this._key] = newVal;
+    this._object[this._key] = newVal
   }
 }
 
@@ -219,10 +221,10 @@ export function toRef<T extends object, K extends keyof T>(
   key: K,
   defaultValue?: T[K]
 ): ToRef<T[K]> {
-  const val = object[key];
+  const val = object[key]
   return isRef(val)
     ? val
-    : (new ObjectRefImpl(object, key, defaultValue) as any);
+    : (new ObjectRefImpl(object, key, defaultValue) as any)
 }
 
 // corner case when use narrows type

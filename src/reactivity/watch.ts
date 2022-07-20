@@ -1,17 +1,19 @@
-import { NOOP, hasChanged, isArray, isFunction, isObject } from "@vue/shared";
-import { ComputedRef } from "./computed";
+import { hasChanged, isArray, isFunction, isObject, NOOP } from "@vue/shared"
+
+import type { ComputedRef } from "./computed"
+import type { EffectScheduler } from "./effect"
 import {
-  EffectScheduler,
   ReactiveEffect,
-  ReactiveEffectOptions,
-} from "./effect";
+  ReactiveEffectOptions
+} from "./effect"
 import {
   callWithAsyncErrorHandling,
   callWithErrorHandling,
-  warn,
-} from "./errorHandling";
-import { isReactive, isShallow } from "./reactive";
-import { isRef, Ref } from "./ref";
+  warn
+} from "./errorHandling"
+import { isReactive, isShallow } from "./reactive"
+import type { Ref } from "./ref"
+import { isRef } from "./ref"
 
 export type WatchEffect = (onInvalidate: InvalidateCbRegistrator) => void;
 
@@ -48,24 +50,24 @@ type MapOldSources<T, Immediate> = {
 };
 
 type InvalidateCbRegistrator = (cb: () => void) => void;
-const INITIAL_WATCHER_VALUE = {};
+const INITIAL_WATCHER_VALUE = {}
 
 export interface WatchOptionsBase {
   /**
    * @depreacted ignored in `@vue-reactivity/watch` and will always be `sync`
    */
-  flush?: "sync" | "pre" | "post";
+  flush?: "sync" | "pre" | "post"
 }
 
 export interface WatchOptions<Immediate = boolean> extends WatchOptionsBase {
-  immediate?: Immediate;
-  deep?: boolean;
+  immediate?: Immediate
+  deep?: boolean
 }
 
 interface SchedulerJob extends Function {
-  id?: number;
-  active?: boolean;
-  computed?: boolean;
+  id?: number
+  active?: boolean
+  computed?: boolean
   /**
    * Indicates whether the effect is allowed to recursively trigger itself
    * when managed by the scheduler.
@@ -81,7 +83,7 @@ interface SchedulerJob extends Function {
    * responsibility to perform recursive state mutation that eventually
    * stabilizes (#1727).
    */
-  allowRecurse?: boolean;
+  allowRecurse?: boolean
 }
 
 // Simple effect.
@@ -89,7 +91,7 @@ export function watchEffect(
   effect: WatchEffect,
   options?: WatchOptionsBase
 ): WatchStopHandle {
-  return doWatch(effect, null, options);
+  return doWatch(effect, null, options)
 }
 
 // overload #1: array of multiple sources + cb
@@ -128,7 +130,7 @@ export function watch<T = any>(
   cb: WatchCallback<T>,
   options?: WatchOptions
 ): WatchStopHandle {
-  return doWatch(source, cb, options);
+  return doWatch(source, cb, options)
 }
 
 function doWatch(
@@ -136,63 +138,63 @@ function doWatch(
   cb: WatchCallback | null,
   { immediate, deep, flush }: WatchOptions = {}
 ): WatchStopHandle {
-  let getter: () => any;
-  let forceTrigger = false;
-  let isMultiSource = false;
+  let getter: () => any
+  let forceTrigger = false
+  let isMultiSource = false
 
   if (isRef(source)) {
-    getter = () => source.value;
-    forceTrigger = isShallow(source);
+    getter = () => source.value
+    forceTrigger = isShallow(source)
   } else if (isReactive(source)) {
-    getter = () => source;
-    deep = true;
+    getter = () => source
+    deep = true
   } else if (isArray(source)) {
-    isMultiSource = true;
-    forceTrigger = source.some(isReactive);
+    isMultiSource = true
+    forceTrigger = source.some(isReactive)
     getter = () =>
       source.map((s) => {
-        if (isRef(s)) return s.value;
-        else if (isReactive(s)) return traverse(s);
-        else if (isFunction(s)) return callWithErrorHandling(s, "watch getter");
-        else return warn("invalid source");
-      });
+        if (isRef(s)) return s.value
+        else if (isReactive(s)) return traverse(s)
+        else if (isFunction(s)) return callWithErrorHandling(s, "watch getter")
+        else return warn("invalid source")
+      })
   } else if (isFunction(source)) {
     if (cb) {
       // getter with cb
-      getter = () => callWithErrorHandling(source, "watch getter");
+      getter = () => callWithErrorHandling(source, "watch getter")
     } else {
       // no cb -> simple effect
       getter = () => {
-        if (cleanup) cleanup();
+        if (cleanup) cleanup()
 
         return callWithAsyncErrorHandling(source, "watch callback", [
-          onCleanup,
-        ]);
-      };
+          onCleanup
+        ])
+      }
     }
   } else {
-    getter = NOOP;
+    getter = NOOP
   }
 
   if (cb && deep) {
-    const baseGetter = getter;
-    getter = () => traverse(baseGetter());
+    const baseGetter = getter
+    getter = () => traverse(baseGetter())
   }
 
-  let cleanup: () => void;
-  let onCleanup: OnCleanup = (fn: () => void) => {
+  let cleanup: () => void
+  const onCleanup: OnCleanup = (fn: () => void) => {
     cleanup = effect.onStop = () => {
-      callWithErrorHandling(fn, "watch cleanup");
-    };
-  };
+      callWithErrorHandling(fn, "watch cleanup")
+    }
+  }
 
-  let oldValue = isMultiSource ? [] : INITIAL_WATCHER_VALUE;
+  let oldValue = isMultiSource ? [] : INITIAL_WATCHER_VALUE
   const job: SchedulerJob = () => {
-    if (!effect.active) return;
+    if (!effect.active) return
 
     if (cb) {
       // watch(source, cb)
-      const newValue = effect.run();
+      const newValue = effect.run()
       if (
         deep ||
         forceTrigger ||
@@ -203,66 +205,66 @@ function doWatch(
           : hasChanged(newValue, oldValue))
       ) {
         // cleanup before running cb again
-        if (cleanup) cleanup();
+        if (cleanup) cleanup()
 
         callWithAsyncErrorHandling(cb, "watch value", [
           newValue,
           // pass undefined as the old value when it's changed for the first time
           oldValue === INITIAL_WATCHER_VALUE ? undefined : oldValue,
-          onCleanup,
-        ]);
-        oldValue = newValue;
+          onCleanup
+        ])
+        oldValue = newValue
       }
     } else {
       // watchEffect
-      effect.run();
+      effect.run()
     }
-  };
+  }
 
   // important: mark the job as a watcher callback so that scheduler knows
   // it is allowed to self-trigger (#1727)
-  job.allowRecurse = !!cb;
+  job.allowRecurse = !!cb
 
-  let scheduler: EffectScheduler;
+  let scheduler: EffectScheduler
   if (flush === "sync") {
-    scheduler = job as any; // the scheduler function gets called directly
+    scheduler = job as any // the scheduler function gets called directly
   } else {
     // default: 'pre'
     scheduler = () => {
-      job();
-    };
+      job()
+    }
   }
 
-  const effect = new ReactiveEffect(getter, scheduler);
+  const effect = new ReactiveEffect(getter, scheduler)
 
   // initial run
   if (cb) {
-    if (immediate) job();
-    else oldValue = effect.run();
+    if (immediate) job()
+    else oldValue = effect.run()
   } else {
-    effect.run();
+    effect.run()
   }
 
-  return () => effect.stop();
+  return () => effect.stop()
 }
 
 function traverse(value: unknown, seen: Set<unknown> = new Set()) {
-  if (!isObject(value) || seen.has(value)) return value;
+  if (!isObject(value) || seen.has(value)) return value
 
-  seen.add(value);
+  seen.add(value)
   if (isArray(value)) {
-    for (let i = 0; i < value.length; i++) traverse(value[i], seen);
+    for (let i = 0; i < value.length; i++) traverse(value[i], seen)
   } else if (value instanceof Map) {
     value.forEach((_, key) => {
       // to register mutation dep for existing keys
-      traverse(value.get(key), seen);
-    });
+      traverse(value.get(key), seen)
+    })
   } else if (value instanceof Set) {
     value.forEach((v) => {
-      traverse(v, seen);
-    });
+      traverse(v, seen)
+    })
   } else {
-    for (const key of Object.keys(value)) traverse(value[key], seen);
+    for (const key of Object.keys(value)) traverse(value[key], seen)
   }
-  return value;
+  return value
 }
