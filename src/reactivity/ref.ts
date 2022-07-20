@@ -10,8 +10,7 @@ import {
   trackEffects,
   triggerEffects
 } from "./effect"
-import { TrackOpTypes, TriggerOpTypes } from "./operations"
-import { isProxy, isReactive, toRaw, toReactive } from "./reactive"
+import { isReactive, toRaw, toReactive } from "./reactive"
 import type { ShallowReactiveMarker } from "./reactive"
 
 declare const RefSymbol: unique symbol
