@@ -5,7 +5,7 @@ export default defineConfig({
   clean: true,
   splitting: true,
   dts: true,
-  format: ["cjs", "iife"],
+  format: ["cjs", "esm", "iife"],
   target: "es2015",
   external: ["react"]
 })
