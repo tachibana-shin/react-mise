@@ -8,9 +8,7 @@ export function callWithErrorHandling(
   let res
   try {
     res = args ? fn(...args) : fn()
-  } catch (err) {
-    handleError(err, type)
-  }
+  } catch {}
   return res
 }
 
@@ -22,9 +20,7 @@ export function callWithAsyncErrorHandling(
   if (isFunction(fn)) {
     const res = callWithErrorHandling(fn, type, args)
     if (res && isPromise(res)) {
-      res.catch((err) => {
-        handleError(err, type)
-      })
+      res.catch(() => {})
     }
     return res
   }
@@ -34,21 +30,4 @@ export function callWithAsyncErrorHandling(
     values.push(callWithAsyncErrorHandling(fn[i], type, args))
 
   return values
-}
-
-export function handleError(err: unknown, type: string) {
-  console.error(new Error(`[@vue-reactivity/watch]: ${type}`))
-  console.error(err)
-}
-
-export function raise(message: string): never {
-  throw createError(message)
-}
-
-export function warn(message: string) {
-  console.warn(createError(message))
-}
-
-export function createError(message: string) {
-  return new Error(`[reactivue]: ${message}`)
 }

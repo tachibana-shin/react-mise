@@ -2,39 +2,36 @@ import { hasChanged, isArray, isFunction, isObject, NOOP } from "./shared"
 
 import type { ComputedRef } from "./computed"
 import type { EffectScheduler } from "./effect"
-import {
-  ReactiveEffect
-} from "./effect"
+import { ReactiveEffect } from "./effect"
 import {
   callWithAsyncErrorHandling,
-  callWithErrorHandling,
-  warn
+  callWithErrorHandling
 } from "./errorHandling"
 import { isReactive, isShallow } from "./reactive"
 import type { Ref } from "./ref"
 import { isRef } from "./ref"
 
-export type WatchEffect = (onInvalidate: InvalidateCbRegistrator) => void;
+export type WatchEffect = (onInvalidate: InvalidateCbRegistrator) => void
 
-export type WatchSource<T = any> = Ref<T> | ComputedRef<T> | (() => T);
+export type WatchSource<T = any> = Ref<T> | ComputedRef<T> | (() => T)
 
 export type WatchCallback<V = any, OV = any> = (
   value: V,
   oldValue: OV,
   onInvalidate: InvalidateCbRegistrator
-) => any;
+) => any
 
-export type WatchStopHandle = () => void;
+export type WatchStopHandle = () => void
 
-type OnCleanup = (cleanupFn: () => void) => void;
+type OnCleanup = (cleanupFn: () => void) => void
 
 type MapSources<T> = {
   [K in keyof T]: T[K] extends WatchSource<infer V>
     ? V
     : T[K] extends object
     ? T[K]
-    : never;
-};
+    : never
+}
 
 type MapOldSources<T, Immediate> = {
   [K in keyof T]: T[K] extends WatchSource<infer V>
@@ -45,10 +42,10 @@ type MapOldSources<T, Immediate> = {
     ? Immediate extends true
       ? T[K] | undefined
       : T[K]
-    : never;
-};
+    : never
+}
 
-type InvalidateCbRegistrator = (cb: () => void) => void;
+type InvalidateCbRegistrator = (cb: () => void) => void
 const INITIAL_WATCHER_VALUE = {}
 
 export interface WatchOptionsBase {
@@ -104,14 +101,14 @@ export function watch<
   sources: T,
   cb: WatchCallback<MapSources<T>, MapOldSources<T, Immediate>>,
   options?: WatchOptions<Immediate>
-): WatchStopHandle;
+): WatchStopHandle
 
 // overload #2: single source + cb
 export function watch<T, Immediate extends Readonly<boolean> = false>(
   source: WatchSource<T>,
   cb: WatchCallback<T, Immediate extends true ? T | undefined : T>,
   options?: WatchOptions<Immediate>
-): WatchStopHandle;
+): WatchStopHandle
 
 // overload #3: watching reactive object w/ cb
 export function watch<
@@ -121,7 +118,7 @@ export function watch<
   source: T,
   cb: WatchCallback<T, Immediate extends true ? T | undefined : T>,
   options?: WatchOptions<Immediate>
-): WatchStopHandle;
+): WatchStopHandle
 
 // implementation
 export function watch<T = any>(
@@ -155,7 +152,7 @@ function doWatch(
         if (isRef(s)) return s.value
         else if (isReactive(s)) return traverse(s)
         else if (isFunction(s)) return callWithErrorHandling(s, "watch getter")
-        else return warn("invalid source")
+        else return
       })
   } else if (isFunction(source)) {
     if (cb) {
@@ -166,9 +163,7 @@ function doWatch(
       getter = () => {
         if (cleanup) cleanup()
 
-        return callWithAsyncErrorHandling(source, "watch callback", [
-          onCleanup
-        ])
+        return callWithAsyncErrorHandling(source, "watch callback", [onCleanup])
       }
     }
   } else {
