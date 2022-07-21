@@ -125,7 +125,27 @@ function defineStore<
 
   const { actions = {} as Actions } = options
 
-  const state = reactive(options.state?.() ?? {}) as (ReadonlyState extends true
+  const state = reactive(
+    Object.assign(
+      options.state?.() ?? {},
+
+      (options.getters &&
+        // eslint-disable-next-line n/no-unsupported-features/es-builtins
+        Object.fromEntries(
+          Object.entries(options.getters).map(([name, getter]) => [
+            name,
+            computed(() =>
+              getter.call(
+                state,
+                state as UnwrapNestedRefs<State> &
+                  Actions &
+                  FlatGetters<Getters>
+              )
+            )
+          ])
+        )) as FlatGetters<Getters>
+    )
+  ) as (ReadonlyState extends true
     ? DeepReadonly<UnwrapNestedRefs<State>>
     : UnwrapNestedRefs<State>) &
     Actions &
@@ -141,23 +161,7 @@ function defineStore<
   // ============================================================
 
   // re-bind actions
-  Object.assign(
-    state,
-    actions,
-    (options.getters &&
-      // eslint-disable-next-line n/no-unsupported-features/es-builtins
-      Object.fromEntries(
-        Object.entries(options.getters).map(([name, getter]) => [
-          name,
-          computed(() =>
-            getter.call(
-              state,
-              state as UnwrapNestedRefs<State> & Actions & FlatGetters<Getters>
-            )
-          )
-        ])
-      )) as FlatGetters<Getters>
-  )
+  Object.assign(state, actions)
 
   return (used): UsedStore<State, Actions, Getters, ReadonlyState> => {
     try {
