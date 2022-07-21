@@ -5,7 +5,7 @@
 </p>
 
 
-[![Build](https://github.com/tachibana-shin/react-mise/actions/workflows/build-docs.yml/badge.svg)](https://github.com/tachibana-shin/react-mise/actions/workflows/docs.yml)
+[![Build](https://github.com/tachibana-shin/react-mise/actions/workflows/test.yml/badge.svg)](https://github.com/tachibana-shin/react-mise/actions/workflows/test.yml)
 [![NPM](https://badge.fury.io/js/react-mise.svg)](http://badge.fury.io/js/react-mise)
 [![Size](https://img.shields.io/bundlephobia/minzip/react-mise/latest)](https://npmjs.org/package/react-mise)
 [![Languages](https://img.shields.io/github/languages/top/tachibana-shin/react-mise)](https://npmjs.org/package/react-mise)
