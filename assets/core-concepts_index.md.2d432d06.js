@@ -1,0 +1,23 @@
+import{_ as n,o as s,c as e,a}from"./app.94b42f56.js";const h='{"title":"Defining a Store","description":"","frontmatter":{},"headers":[{"level":2,"title":"Using the store","slug":"using-the-store"}],"relativePath":"core-concepts/index.md"}',t={},o=a(`<h1 id="defining-a-store" tabindex="-1">Defining a Store <a class="header-anchor" href="#defining-a-store" aria-hidden="true">#</a></h1><p>Before diving into core concepts, we need to know that a store is defined using <code>defineStore()</code> and that it requires a <strong>unique</strong> name, passed as the first argument:</p><div class="language-js"><pre><code><span class="token keyword">import</span> <span class="token punctuation">{</span> defineStore <span class="token punctuation">}</span> <span class="token keyword">from</span> <span class="token string">&quot;react-mise&quot;</span>
+
+<span class="token comment">// useStore could be anything like useUser, useCart</span>
+<span class="token comment">// the first argument is a unique id of the store across your application</span>
+<span class="token keyword">export</span> <span class="token keyword">const</span> useStore <span class="token operator">=</span> <span class="token function">defineStore</span><span class="token punctuation">(</span><span class="token string">&quot;main&quot;</span><span class="token punctuation">,</span> <span class="token punctuation">{</span>
+  <span class="token comment">// other options...</span>
+<span class="token punctuation">}</span><span class="token punctuation">)</span>
+</code></pre></div><p>This <em>name</em>, also referred as <em>id</em>, is necessary and is used by React Mise to connect the store to the devtools. Naming the returned function <em>use...</em> is a convention across composables to make its usage idiomatic.</p><h2 id="using-the-store" tabindex="-1">Using the store <a class="header-anchor" href="#using-the-store" aria-hidden="true">#</a></h2><p>We are <em>defining</em> a store because the store won&#39;t be created until <code>useStore()</code> is called inside of <code>setup()</code>:</p><div class="language-js"><pre><code><span class="token keyword">export</span> <span class="token keyword">default</span> <span class="token keyword">function</span> <span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+  <span class="token keyword">const</span> <span class="token punctuation">[</span>store<span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token function">useStore</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+
+  <span class="token comment">// you can return the whole store instance to use it in the template</span>
+<span class="token punctuation">}</span>
+</code></pre></div><p>You can define as many stores as you want and <strong>you should define each store in a different file</strong> to get the most out of react-mise (like automatically allow your bundle to code split and TypeScript inference).</p><p>Once the store is instantiated, you can access any property defined in <code>state</code>, <code>getters</code>, and <code>actions</code> directly on the store. We will see these in detail in the next pages but autocompletion will help you.</p><div class="language-js"><pre><code><span class="token keyword">export</span> <span class="token keyword">default</span> <span class="token keyword">function</span> <span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+  <span class="token keyword">const</span> <span class="token punctuation">[</span>store<span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token function">useStore</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+
+  <span class="token comment">// \u274C This won&#39;t work because it breaks reactivity</span>
+  <span class="token comment">// it&#39;s the same as destructuring from \`props\`</span>
+  <span class="token keyword">const</span> <span class="token punctuation">{</span> name<span class="token punctuation">,</span> doubleCount <span class="token punctuation">}</span> <span class="token operator">=</span> store
+
+  name <span class="token comment">// &quot;eduardo&quot;</span>
+  doubleCount <span class="token comment">// 2</span>
+<span class="token punctuation">}</span>
+</code></pre></div>`,10),p=[o];function c(i,r,u,l,d,k){return s(),e("div",null,p)}var f=n(t,[["render",c]]);export{h as __pageData,f as default};
