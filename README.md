@@ -29,6 +29,47 @@
 
 To learn more about React Mise, check [its documentation](https://shin.is-a.dev/react-mise).
 
+## Basic usage
+
+stores/counter.ts
+``` ts
+import { defineStore } from "react-mise"
+
+export const useCounterStore = defineStore({
+  state: () => ({
+    counter: 0
+  }),
+  getters: {
+    double() {
+      return this.counter * 2
+    }
+  },
+  actions: {
+    increment() {
+      this.counter++
+    }
+  }
+})
+```
+
+App.tsx
+``` tsx
+import { useCounterStore } from "./stores/counter"
+
+export default function App() {
+  const [counterStore] = useCounterStore()
+
+  return (
+    <>
+      Counter: {counterStore.counter} <br />
+      Double counter: {counterStore.double} <br />
+
+      <button onClick={counterStore.increment}>counter++</button>
+    </>
+  )
+}
+```
+
 ## License
 
 [MIT](http://opensource.org/licenses/MIT)
