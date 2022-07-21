@@ -9,6 +9,12 @@ const useStore1 = defineStore({
   state: () => ({
     count: 0
   }),
+  getters: {
+    doubleCount() {
+      console.log(this)
+      return this.count * 2
+    }
+  },
   actions: {
     increment() {
       // eslint-disable-next-line functional/immutable-data
@@ -50,7 +56,9 @@ function App() {
       </div>
       <h1>Vite + React</h1>
       <div className="card">
-        <button onClick={store2.increment2}>count is {store1.count}</button>
+        <button onClick={store2.increment2}>
+          count is {store1.count}. double is {store1.doubleCount}
+        </button>
         <button onClick={store2.increment}>count is {store2.count}</button>
         <p>
           Edit <code>src/App.tsx</code> and save to test HMR
