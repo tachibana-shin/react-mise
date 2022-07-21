@@ -87,7 +87,7 @@ export class ReactiveEffect<T = any> {
 
   record() {
     if (!this.active) return
-    if (activeEffect && activeEffect.id !== this.id) {
+    if (activeEffect && this.id && activeEffect.id !== this.id) {
       this.paused = true
       return
     }
