@@ -17,7 +17,7 @@ import { TriggerOpTypes } from "./operations"
 // Conceptually, it's easier to think of a dependency as a Dep class
 // which maintains a Set of subscribers, but we simply store them as
 // raw Sets to reduce memory overhead.
-type KeyToDepMap = Map<any, Dep>;
+type KeyToDepMap = Map<any, Dep>
 const targetMap = new WeakMap<any, KeyToDepMap>()
 
 // The number of effects currently being tracked recursively.
@@ -32,11 +32,11 @@ export let trackOpBit = 1
  */
 const maxMarkerBits = 30
 
-export type EffectScheduler = (...args: any[]) => any;
+export type EffectScheduler = (...args: any[]) => any
 
 export type DebuggerEvent = {
   effect: ReactiveEffect
-} & DebuggerEventExtraInfo;
+} & DebuggerEventExtraInfo
 
 export interface DebuggerEventExtraInfo {
   target: object
@@ -48,7 +48,9 @@ export interface DebuggerEventExtraInfo {
 }
 
 export let activeEffect: ReactiveEffect | undefined
-
+export function effectNotActived(id: string) {
+  return activeEffect && activeEffect.id !== id
+}
 export const ITERATE_KEY = Symbol("")
 export const MAP_KEY_ITERATE_KEY = Symbol("")
 
@@ -71,25 +73,30 @@ export class ReactiveEffect<T = any> {
    */
   private deferStop?: boolean
   private lastShouldTracks: boolean[] = []
+  private paused?: boolean
 
   onStop?: () => void
 
   constructor(
     public fn: (() => T) | null = null,
-    public scheduler: EffectScheduler | null = null
+    public scheduler: EffectScheduler | null = null,
+    public id?: string
   ) {
     // recordEffectScope(this, scope);
   }
 
   record() {
     if (!this.active) return
+    if (activeEffect && activeEffect.id !== this.id) {
+      this.paused = true
+      return
+    }
 
     let parent: ReactiveEffect | undefined = activeEffect
     this.lastShouldTracks.push(shouldTrack)
     while (parent) {
-      if (parent === this)
-        return false
-        // break;
+      if (parent === this) return false
+      // break;
 
       parent = parent.parent
     }
@@ -100,17 +107,19 @@ export class ReactiveEffect<T = any> {
 
     trackOpBit = 1 << ++effectTrackDepth
 
-    if (effectTrackDepth <= maxMarkerBits)
-      initDepMarkers(this)
-    else
-      cleanupEffect(this)
+    if (effectTrackDepth <= maxMarkerBits) initDepMarkers(this)
+    else cleanupEffect(this)
 
     return true
   }
 
   end() {
-    if (effectTrackDepth <= maxMarkerBits)
-      finalizeDepMarkers(this)
+    if (this.paused) {
+      this.paused = false
+
+      return
+    }
+    if (effectTrackDepth <= maxMarkerBits) finalizeDepMarkers(this)
 
     trackOpBit = 1 << --effectTrackDepth
 
@@ -118,13 +127,11 @@ export class ReactiveEffect<T = any> {
     shouldTrack = this.lastShouldTracks.shift() ?? shouldTrack
     this.parent = undefined
 
-    if (this.deferStop)
-      this.stop()
+    if (this.deferStop) this.stop()
   }
 
   run() {
-    if (!this.active)
-      return this.fn!()
+    if (!this.active) return this.fn!()
 
     if (!this.record()) return
     try {
@@ -140,8 +147,7 @@ export class ReactiveEffect<T = any> {
       this.deferStop = true
     } else if (this.active) {
       cleanupEffect(this)
-      if (this.onStop)
-        this.onStop()
+      if (this.onStop) this.onStop()
 
       this.active = false
     }
@@ -151,8 +157,7 @@ export class ReactiveEffect<T = any> {
 export function cleanupEffect(effect: ReactiveEffect) {
   const { deps } = effect
   if (deps.length) {
-    for (let i = 0; i < deps.length; i++)
-      deps[i].delete(effect)
+    for (let i = 0; i < deps.length; i++) deps[i].delete(effect)
 
     deps.length = 0
   }
@@ -179,12 +184,10 @@ export function effect<T = any>(
     fn = (fn as ReactiveEffectRunner).effect.fn!
 
   const _effect = new ReactiveEffect(fn)
-  if (options)
-    extend(_effect, options)
-    // if (options.scope) recordEffectScope(_effect, options.scope);
+  if (options) extend(_effect, options)
+  // if (options.scope) recordEffectScope(_effect, options.scope);
 
-  if (!options || !options.lazy)
-    _effect.run()
+  if (!options || !options.lazy) _effect.run()
 
   const runner = _effect.run.bind(_effect) as ReactiveEffectRunner
   runner.effect = _effect
@@ -216,12 +219,10 @@ export function resetTracking() {
 export function track(target: object, type: TrackOpTypes, key: unknown) {
   if (shouldTrack && activeEffect) {
     let depsMap = targetMap.get(target)
-    if (!depsMap)
-      targetMap.set(target, (depsMap = new Map()))
+    if (!depsMap) targetMap.set(target, (depsMap = new Map()))
 
     let dep = depsMap.get(key)
-    if (!dep)
-      depsMap.set(key, (dep = createDep()))
+    if (!dep) depsMap.set(key, (dep = createDep()))
 
     trackEffects(dep)
   }
@@ -266,21 +267,18 @@ export function trigger(
     deps = [...depsMap.values()]
   } else if (key === "length" && isArray(target)) {
     depsMap.forEach((dep, key) => {
-      if (key === "length" || key >= (newValue as number))
-        deps.push(dep)
+      if (key === "length" || key >= (newValue as number)) deps.push(dep)
     })
   } else {
     // schedule runs for SET | ADD | DELETE
-    if (key !== void 0)
-      deps.push(depsMap.get(key))
+    if (key !== void 0) deps.push(depsMap.get(key))
 
     // also run for iteration key on ADD | DELETE | Map.SET
     switch (type) {
       case TriggerOpTypes.ADD:
         if (!isArray(target)) {
           deps.push(depsMap.get(ITERATE_KEY))
-          if (isMap(target))
-            deps.push(depsMap.get(MAP_KEY_ITERATE_KEY))
+          if (isMap(target)) deps.push(depsMap.get(MAP_KEY_ITERATE_KEY))
         } else if (isIntegerKey(key)) {
           // new index added to array -> length changes
           deps.push(depsMap.get("length"))
@@ -289,26 +287,22 @@ export function trigger(
       case TriggerOpTypes.DELETE:
         if (!isArray(target)) {
           deps.push(depsMap.get(ITERATE_KEY))
-          if (isMap(target))
-            deps.push(depsMap.get(MAP_KEY_ITERATE_KEY))
+          if (isMap(target)) deps.push(depsMap.get(MAP_KEY_ITERATE_KEY))
         }
         break
       case TriggerOpTypes.SET:
-        if (isMap(target))
-          deps.push(depsMap.get(ITERATE_KEY))
+        if (isMap(target)) deps.push(depsMap.get(ITERATE_KEY))
 
         break
     }
   }
 
   if (deps.length === 1) {
-    if (deps[0])
-      triggerEffects(deps[0])
+    if (deps[0]) triggerEffects(deps[0])
   } else {
     const effects: ReactiveEffect[] = []
     for (const dep of deps) {
-      if (dep)
-        effects.push(...dep)
+      if (dep) effects.push(...dep)
     }
     triggerEffects(createDep(effects))
   }
@@ -318,20 +312,16 @@ export function triggerEffects(dep: Dep | ReactiveEffect[]) {
   // spread into array for stabilization
   const effects = isArray(dep) ? dep : [...dep]
   for (const effect of effects) {
-    if (effect.computed)
-      triggerEffect(effect)
+    if (effect.computed) triggerEffect(effect)
   }
   for (const effect of effects) {
-    if (!effect.computed)
-      triggerEffect(effect)
+    if (!effect.computed) triggerEffect(effect)
   }
 }
 
 function triggerEffect(effect: ReactiveEffect) {
   if (effect !== activeEffect || effect.allowRecurse) {
-    if (effect.scheduler)
-      effect.scheduler()
-    else
-      effect.run()
+    if (effect.scheduler) effect.scheduler()
+    else effect.run()
   }
 }
