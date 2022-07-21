@@ -1,6 +1,6 @@
 ---
 home: true
-heroImage: /react-mise/react-mise.svg
+heroImage: /react-mise.svg
 actionText: Get Started
 actionLink: /introduction.html
 
