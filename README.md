@@ -1,6 +1,6 @@
 <p align="center">
   <a href="https://shin.is-a.dev/react-mise" target="_blank" rel="noopener noreferrer">
-    <img width="180" src="./react-mise.svg" alt="React Mise logo">
+    <img width="180" src="./react-mise.png" alt="React Mise logo">
   </a>
 </p>
 
@@ -18,7 +18,7 @@
 [![Download](https://img.shields.io/npm/dm/react-mise)](https://npmjs.org/package/react-mise)
 
 
-## 👉 [Demo with React on StackBlitz](#)
+## 👉 [Demo with React on StackBlitz](https://stackblitz.com/edit/react-mise-example-vite)
 
 ## Help me keep working on this project 💚
 
