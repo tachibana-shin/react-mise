@@ -1,0 +1,1 @@
+import{_ as n,o as s,c as e,a}from"./app.66459213.js";const h='{"title":"Defining a Store","description":"","frontmatter":{},"headers":[{"level":2,"title":"Using the store","slug":"using-the-store"}],"relativePath":"core-concepts/index.md"}',t={},o=a("",10),p=[o];function c(i,r,u,l,d,k){return s(),e("div",null,p)}var f=n(t,[["render",c]]);export{h as __pageData,f as default};
