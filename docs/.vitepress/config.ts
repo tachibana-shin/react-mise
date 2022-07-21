@@ -163,19 +163,6 @@ export default defineConfig({
           ]
         },
         {
-          text: "Server-Side Rendering (SSR)",
-          children: [
-            {
-              text: "Vue and Vite",
-              link: "/ssr/"
-            },
-            {
-              text: "Nuxt.js",
-              link: "/ssr/nuxt.html"
-            }
-          ]
-        },
-        {
           text: "Cookbook",
           link: "/cookbook/",
           children: [
