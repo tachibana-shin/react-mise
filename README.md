@@ -1,6 +1,6 @@
 <p align="center">
   <a href="https://shin.is-a.dev/react-mise" target="_blank" rel="noopener noreferrer">
-    <img width="180" src="./react-mise.png" alt="React Mise logo">
+    <img width="180" src="./docs/public/react-mise.png" alt="React Mise logo">
   </a>
 </p>
 

@@ -1,0 +1,22 @@
+{
+  "name": "docs",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "docs:dev": "vitepress dev",
+    "docs:build": "vitepress build"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "sass": "^1.53.0",
+    "typedoc": "^0.23.8",
+    "vite": "^3.0.2",
+    "vitepress": "0.22.2"
+  },
+  "dependencies": {
+    "@vueuse/core": "^8.9.4"
+  }
+}
