@@ -9,5 +9,13 @@ export default defineConfig({
   format: ["cjs", "esm", "iife"],
   target: "es2015",
   external: ["react"],
-  treeshake: true
+  treeshake: true,
+  esbuildOptions(options) {
+    // eslint-disable-next-line functional/immutable-data
+    options.banner = {
+      js: "const __DEV__ = process.env.NODE_ENV === 'production'"
+    }
+
+    return options
+  }
 })

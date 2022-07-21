@@ -2,7 +2,7 @@ import reactLogo from "./assets/react.svg"
 import "./App.css"
 
 // eslint-disable-next-line import/order, n/no-unpublished-import
-import { defineStore, watchEffect } from "../../src/index"
+import { defineStore } from "../../src/index"
 
 const useStore1 = defineStore({
   // id: "store1",

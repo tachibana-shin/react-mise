@@ -1,9 +1,4 @@
-import {
-  useEffect,
-  useId,
-  useState,
-  __SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED
-} from "react"
+import { useEffect, useState } from "react"
 
 import { computed } from "./reactivity/computed"
 import {
@@ -46,6 +41,10 @@ export type UsedStore<
 const randomUUID = (): string => {
   return Math.random().toString(36).slice(2, 9)
 }
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-expect-error
+// eslint-disable-next-line no-undef
+const storeIds = (__DEV__ as unknown as boolean) ? new Set<string>() : undefined
 
 function defineStore<
   // eslint-disable-next-line @typescript-eslint/ban-types
@@ -67,6 +66,7 @@ function defineStore<
 ): () => UsedStore<State, Actions, Getters, ReadonlyState>
 // eslint-disable-next-line no-redeclare
 function defineStore<
+  // eslint-disable-next-line @typescript-eslint/ban-types
   State extends Record<string, unknown> = {},
   // eslint-disable-next-line @typescript-eslint/ban-types
   Actions = {},
@@ -106,6 +106,23 @@ function defineStore<
     options = id as Exclude<typeof id, string>
     id = options.id ?? randomUUID()
   }
+
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-expect-error
+  // eslint-disable-next-line no-undef
+  if (__DEV__) {
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    if (storeIds!.has(id as string)) {
+      // eslint-disable-next-line functional/no-throw-statement
+      throw new Error(
+        `[react-mise]: store id "${id}" has already been assigned`
+      )
+    } else {
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      storeIds!.add(id as string)
+    }
+  }
+
   const { actions = {} as Actions } = options
 
   const state = reactive(options.state?.() ?? {}) as (ReadonlyState extends true
