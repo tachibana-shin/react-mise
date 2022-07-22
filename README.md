@@ -1,11 +1,11 @@
 <p align="center">
-  <a href="https://shin.is-a.dev/react-mise" target="_blank" rel="noopener noreferrer">
+  <a href="https://react-mise.js.org" target="_blank" rel="noopener noreferrer">
     <img width="180" src="./docs/public/react-mise.png" alt="React Mise logo">
   </a>
 </p>
 
 
-[![Build](https://github.com/tachibana-shin/react-mise/actions/workflows/build-docs.yml/badge.svg)](https://github.com/tachibana-shin/react-mise/actions/workflows/docs.yml)
+[![Build](https://github.com/tachibana-shin/react-mise/actions/workflows/test.yml/badge.svg)](https://github.com/tachibana-shin/react-mise/actions/workflows/test.yml)
 [![NPM](https://badge.fury.io/js/react-mise.svg)](http://badge.fury.io/js/react-mise)
 [![Size](https://img.shields.io/bundlephobia/minzip/react-mise/latest)](https://npmjs.org/package/react-mise)
 [![Languages](https://img.shields.io/github/languages/top/tachibana-shin/react-mise)](https://npmjs.org/package/react-mise)
@@ -46,11 +46,11 @@ A few notes about the project and possible questions:
 
 **Q**: _Is React Mise the successor of Redux?_
 
-**A**: [Yes](https://shin.is-a.dev/react-mise/guide/scaling-up/state-management.html#react-mise)
+**A**: [Yes](https://react-mise.js.org/guide/scaling-up/state-management.html#react-mise)
 
 **Q**: _What about dynamic modules?_
 
-**A**: Dynamic modules are not type safe, so instead [we allow creating different stores](https://shin.is-a.dev/react-mise/cookbook/composing-stores.html) that can be imported anywhere
+**A**: Dynamic modules are not type safe, so instead [we allow creating different stores](https://react-mise.js.org/cookbook/composing-stores.html) that can be imported anywhere
 
 ## Roadmap / Ideas
 
@@ -151,10 +151,10 @@ watch(mainStore, () => console.log("main store changed"), { deep: true })
 
 ## Documentation
 
-To learn more about React Mise, check [its documentation](https://shin.is-a.dev/react-mise).
+To learn more about React Mise, check [its documentation](https://react-mise.js.org).
 
 ## License
 
 [MIT](http://opensource.org/licenses/MIT)
 
-[https://shin.is-a.dev/react-mise](https://shin.is-a.dev/react-mise)
+[https://react-mise.js.org](https://react-mise.js.org)

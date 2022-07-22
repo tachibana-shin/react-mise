@@ -1,13 +1,12 @@
-const META_URL = "https://shin.is-a.dev/react-mise"
+const META_URL = "https://react-mise.js.org"
 const META_TITLE = "React Mise"
 const META_DESCRIPTION =
   "Intuitive, type safe, light and flexible Store for React"
-const META_IMAGE = "https://shin.is-a.dev/react-mise/react-mise.png"
+const META_IMAGE = "https://react-mise.js.org/react-mise.png"
 
 import { defineConfig } from "vitepress"
 
 export default defineConfig({
-  base: "/react-mise/",
   markdown: {
     attrs: {
       leftDelimiter: "%{",
@@ -18,8 +17,8 @@ export default defineConfig({
   lang: "en-US",
   description: "The React Store that you will enjoy using",
   head: [
-    ["link", { rel: "icon", type: "image/svg+xml", href: "/react-mise/react-mise.svg" }],
-    ["link", { rel: "icon", type: "image/png", href: "/react-mise/react-mise.png" }],
+    ["link", { rel: "icon", type: "image/svg+xml", href: "/react-mise.svg" }],
+    ["link", { rel: "icon", type: "image/png", href: "/react-mise.png" }],
 
     [
       "meta",
@@ -159,19 +158,6 @@ export default defineConfig({
             {
               text: "Stores outside of components",
               link: "/core-concepts/outside-component-usage.html"
-            }
-          ]
-        },
-        {
-          text: "Server-Side Rendering (SSR)",
-          children: [
-            {
-              text: "Vue and Vite",
-              link: "/ssr/"
-            },
-            {
-              text: "Nuxt.js",
-              link: "/ssr/nuxt.html"
             }
           ]
         },

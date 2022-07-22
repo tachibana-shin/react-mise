@@ -46,11 +46,17 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git://github.com/Tachibana-Shin/react-mise.git"
+    "url": "git://github.com/tachibana-shin/react-mise.git"
   },
-  "homepage": "https://Tachibana-Shin.github.io/react-mise",
+  "homepage": "https://react-mise.js.org",
   "keywords": [
     "react-mise",
+    "react",
+    "store",
+    "redux",
+    "hook",
+    "composition",
+    "typed",
     "Tachibana Shin",
     "Tachibana-Shin"
   ],
