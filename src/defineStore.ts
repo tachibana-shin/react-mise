@@ -63,7 +63,7 @@ function defineStore<
 >(
   id: string,
   options: OptionsStore<State, Actions, Getters, ReadonlyState>
-): () => UsedStore<State, Actions, Getters, ReadonlyState>
+): (used?: boolean) => UsedStore<State, Actions, Getters, ReadonlyState>
 // eslint-disable-next-line no-redeclare
 function defineStore<
   // eslint-disable-next-line @typescript-eslint/ban-types
@@ -81,7 +81,7 @@ function defineStore<
   ReadonlyState extends boolean = false
 >(
   options: OptionsStore<State, Actions, Getters, ReadonlyState>
-): () => UsedStore<State, Actions, Getters, ReadonlyState>
+): (used?: boolean) => UsedStore<State, Actions, Getters, ReadonlyState>
 
 // eslint-disable-next-line no-redeclare
 function defineStore<
