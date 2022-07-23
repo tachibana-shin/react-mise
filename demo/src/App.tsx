@@ -32,12 +32,22 @@ const useStore2 = defineStore({
       this.count += 1
     },
     increment2() {
-      const [store1] = useStore1()
+      const [store1] = useStore1(true)
 
       store1.increment()
     }
   }
 })
+
+function Button1() {
+  const [store1] = useStore1()
+
+  return (
+    <button onClick={store1.increment}>
+      count is {store1.count}. double is {store1.doubleCount}
+    </button>
+  )
+}
 
 function App() {
   // const [store2] = useStore2()
@@ -56,9 +66,8 @@ function App() {
       </div>
       <h1>Vite + React</h1>
       <div className="card">
-        <button onClick={store2.increment2}>
-          count is {store1.count}. double is {store1.doubleCount}
-        </button>
+        count = {store1.count}
+        <Button1 />
         <button onClick={store2.increment}>count is {store2.count}</button>
         <p>
           Edit <code>src/App.tsx</code> and save to test HMR
