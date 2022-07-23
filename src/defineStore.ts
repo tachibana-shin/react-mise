@@ -183,8 +183,10 @@ function defineStore<
       let effect = effectsMap.get(el)
       if (!effect) {
         effect = new ReactiveEffect(null, () => {
-          if (process.env.NODE_ENV !== "production")
-            console.log("update effect")
+          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+          // @ts-expect-error
+          // eslint-disable-next-line no-undef
+          if (__DEV__) console.log("update effect")
           // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
           forceUpdateMap.get(el)!()
         })
