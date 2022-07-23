@@ -72,8 +72,7 @@ export class ReactiveEffect<T = any> {
    * @internal
    */
   private deferStop?: boolean
-  private lastShouldTracks: boolean[] = []
-  private paused?: boolean
+  private lastShouldTrack?: boolean
 
   onStop?: () => void
 
@@ -85,15 +84,12 @@ export class ReactiveEffect<T = any> {
     // recordEffectScope(this, scope);
   }
 
-  record() {
+  record(noEnd?: boolean) {
     if (!this.active) return
-    if (activeEffect && this.id && activeEffect.id !== this.id) {
-      this.paused = true
-      return
-    }
 
+    if (!noEnd) this.end()
     let parent: ReactiveEffect | undefined = activeEffect
-    this.lastShouldTracks.push(shouldTrack)
+    this.lastShouldTrack = shouldTrack
     while (parent) {
       if (parent === this) return false
       // break;
@@ -114,17 +110,12 @@ export class ReactiveEffect<T = any> {
   }
 
   end() {
-    if (this.paused) {
-      this.paused = false
-
-      return
-    }
     if (effectTrackDepth <= maxMarkerBits) finalizeDepMarkers(this)
 
     trackOpBit = 1 << --effectTrackDepth
 
     activeEffect = this.parent
-    shouldTrack = this.lastShouldTracks.shift() ?? shouldTrack
+    shouldTrack = this.lastShouldTrack ?? shouldTrack
     this.parent = undefined
 
     if (this.deferStop) this.stop()
@@ -133,7 +124,7 @@ export class ReactiveEffect<T = any> {
   run() {
     if (!this.active) return this.fn!()
 
-    if (!this.record()) return
+    if (!this.record(true)) return
     try {
       return this.fn!()
     } finally {
