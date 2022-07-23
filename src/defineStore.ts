@@ -1,11 +1,13 @@
-import { useEffect, useState } from "react"
+import {
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-expect-error
+  __SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED,
+  useEffect,
+  useState
+} from "react"
 
 import { computed } from "./reactivity/computed"
-import {
-  cleanupEffect,
-  effectNotActived,
-  ReactiveEffect
-} from "./reactivity/effect"
+import { ReactiveEffect } from "./reactivity/effect"
 import type { DeepReadonly, UnwrapNestedRefs } from "./reactivity/reactive"
 import { reactive } from "./reactivity/reactive"
 
@@ -163,27 +165,39 @@ function defineStore<
   // re-bind actions
   Object.assign(state, actions)
 
+  // eslint-disable-next-line no-undef, func-call-spacing
+  const forceUpdateMap = new WeakMap<JSX.Element, () => void>()
+  // eslint-disable-next-line no-undef
+  const effectsMap = new WeakMap<JSX.Element, ReactiveEffect>()
   return (used): UsedStore<State, Actions, Getters, ReadonlyState> => {
-    try {
-      if (used || effectNotActived(id as string)) return [state, actions]
+    if (used) return [state, actions]
 
-      // eslint-disable-next-line @typescript-eslint/ban-types
-      const [, setUnique] = useState(undefined as unknown as {})
-      const effect = new ReactiveEffect(
-        () => {
-          setUnique({})
-          cleanupEffect(effect)
-          // eslint-disable-next-line functional/immutable-data
-          effect.active = false
-          effect.stop()
-          // clear effect after call one fn
-        },
-        null,
-        id as string
-      )
+    try {
+      const el =
+        __SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED
+          .ReactCurrentDispatcher.current
+      const [, setUnique] = useState(1)
+      forceUpdateMap.set(el, () => setUnique((v) => v + 1))
+
+      // eslint-disable-next-line functional/no-let
+      let effect = effectsMap.get(el)
+      if (!effect) {
+        effect = new ReactiveEffect(null, () => {
+          if (process.env.NODE_ENV !== "production")
+            console.log("update effect")
+          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+          forceUpdateMap.get(el)!()
+        })
+        effectsMap.set(el, effect)
+      }
+
       effect.record()
-      useEffect(effect.end.bind(effect))
+      useEffect(() => {
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        effect!.end()
+      }, [])
     } catch {}
+
     return [state, actions]
   }
 }
